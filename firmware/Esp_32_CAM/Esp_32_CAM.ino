@@ -1,3 +1,5 @@
+#include <FS.h>
+
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <WebServer.h>
@@ -13,7 +15,7 @@ const char *password = "we4rscrap!";
 // HTTP server on port 80
 WebServer server(80);
 
-// Start camera stream handler
+// Stream handler
 void handleJPGStream() {
   WiFiClient client = server.client();
   String response = "HTTP/1.1 200 OK\r\n";
@@ -37,19 +39,36 @@ void handleJPGStream() {
   }
 }
 
-// Main camera server setup
+// Single capture handler
+void handleCapture() {
+  camera_fb_t *fb = esp_camera_fb_get();
+  if (!fb) {
+    server.send(500, "text/plain", "Camera capture failed");
+    return;
+  }
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send_P(200, "image/jpeg", (char *)fb->buf, fb->len);
+  esp_camera_fb_return(fb);
+}
+
+// Setup camera server with both stream and capture endpoints
 void startCameraServer() {
   server.on("/", HTTP_GET, []() {
-    server.send(200, "text/html", "<html><body><h1>ESP32-CAM Stream</h1><img src='/stream'></body></html>");
+    server.send(200, "text/html",
+      "<html><body><h1>ESP32-CAM</h1>"
+      "<p><a href='/stream'>Start Stream</a></p>"
+      "<p><a href='/capture'>Capture Image</a></p>"
+      "<img src='/stream' style='width: 100%; max-width: 600px;' />"
+      "</body></html>");
   });
 
   server.on("/stream", HTTP_GET, handleJPGStream);
+  server.on("/capture", HTTP_GET, handleCapture);
 
   server.begin();
   Serial.println("Camera server started");
 }
 
-// Optional: Flash LED setup (if needed)
 void setupLedFlash(int pin) {
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);

@@ -16,6 +16,11 @@ function DashboardPage() {
   useEffect(() => {
     loadSensorData();
     loadPredictionData();
+    const interval = setInterval(() => {
+      loadSensorData();
+    }, 60000);
+
+    return () => clearInterval(interval); 
   }, []);
 
   const loadSensorData = async () => {
@@ -51,10 +56,13 @@ function DashboardPage() {
       <div style={gridStyle}>
         {sensorData.map((s, i) => (
           <div key={i} style={resultCardStyle}>
-            <p><strong>🌡️ Temp:</strong> {s.temperature} °C</p>
-            <p><strong>💧 Humidity:</strong> {s.humidity} %</p>
-            <p><strong>🌿 Soil:</strong> {s.soil_moisture} %</p>
             <p style={timestampStyle}>{new Date(s.timestamp).toLocaleString()}</p>
+            <p><strong>🌡️ Temperature:</strong> {s.temperature} °C</p>
+            <p><strong>💧 Humidity:</strong> {s.humidity} %</p>
+            <p><strong>🌱 Soil Moisture:</strong> {s.soil_value}</p>
+            <p><strong>🧪 Soil Condition:</strong> {s.soil_status}</p>
+            <p><strong>💡 Light Status:</strong> {s.light_status}</p>
+            
           </div>
         ))}
       </div>
@@ -70,7 +78,6 @@ function DashboardPage() {
       <div style={gridStyle}>
         {predictions.map((p, i) => (
           <div key={i} style={resultCardStyle}>
-            <p><strong>Disease:</strong> {p.disease}</p>
             <p style={timestampStyle}>{new Date(p.timestamp).toLocaleString()}</p>
             {p.image_url && (
               <img
@@ -79,6 +86,15 @@ function DashboardPage() {
                 style={imageStyle}
               />
             )}
+            <p><strong>Disease:</strong> {p.disease}</p>
+            <p><strong>Symptoms:</strong> {p.symptoms}</p>
+            <p><strong>Cause:</strong> {p.cause}</p>
+            <p><strong>Precautions:</strong> {p.precautions}</p>
+            <p><strong>Organic Remedies:</strong> {p.organic_remedies}</p>
+            <p><strong>Chemical Treatment:</strong> {p.chemical_treatment}</p>
+
+            
+            
           </div>
         ))}
       </div>
@@ -97,13 +113,13 @@ function DashboardPage() {
               style={buttonStyle(selectedView === 'sensor')}
               onClick={() => setSelectedView('sensor')}
             >
-              🌱 Sensor Readings
+              Sensor Readings
             </button>
             <button
               style={buttonStyle(selectedView === 'prediction')}
               onClick={() => setSelectedView('prediction')}
             >
-              🦠 Disease Predictions
+              Disease Predictions
             </button>
           </div>
 

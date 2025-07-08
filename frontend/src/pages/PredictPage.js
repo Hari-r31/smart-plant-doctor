@@ -14,45 +14,45 @@ function PredictPage() {
     if (selectedFile) {
       setFile(selectedFile);
       setError(null);
-      
-      // Create preview
+      setPrediction(null);
+
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
+      reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(selectedFile);
     }
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      setError('Please select an image first');
-      return;
+  const predictImage = async (blob) => {
+    const formData = new FormData();
+    formData.append('file', blob);
+
+    const apiUrl =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:8000/predict'
+        : '/predict';
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Prediction failed');
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
+    return await response.json();
+  };
+
+  const handleUpload = async () => {
+    if (!file) return setError('Please select an image first');
 
     try {
       setUploading(true);
       setError(null);
-      setPrediction(null); // Clear previous results
-      
-      const apiUrl = process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:8000/predict' 
-        : '/predict';
+      setPrediction(null);
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'Prediction failed');
-      }
-
-      const result = await response.json();
+      const result = await predictImage(file);
       setPrediction(result);
     } catch (err) {
       console.error('Prediction error:', err);
@@ -62,81 +62,73 @@ function PredictPage() {
     }
   };
 
+  const handleCaptureFromESP32 = async () => {
+    setUploading(true);
+    setError(null);
+    setPrediction(null);
+
+    try {
+      const response = await fetch('http://192.168.0.50/capture');
+      if (!response.ok) throw new Error('Failed to fetch image from ESP32-CAM');
+
+      const blob = await response.blob();
+      setPreview(URL.createObjectURL(blob));
+
+      const result = await predictImage(blob);
+      setPrediction(result);
+    } catch (err) {
+      console.error('ESP32 error:', err);
+      setError(err.message || 'ESP32-CAM capture failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div style={styles.pageContainer}>
       <Navbar />
-
       <main style={styles.mainContent}>
-        <div style={styles.contentWrapper}>
-          {/* Upload Card - Left Side */}
-          <div style={styles.uploadSection}>
-            <Card title="Upload Leaf Image" style={styles.card}>
-              <div style={styles.inputGroup}>
-                <label htmlFor="leafImage" style={styles.fileInputLabel}>
-                  {file ? file.name : 'Choose an image'}
-                  <input
-                    id="leafImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={styles.fileInput}
-                    disabled={uploading}
-                  />
-                </label>
-
-                {preview && (
-                  <img 
-                    src={preview} 
-                    alt="Preview" 
-                    style={styles.previewImage} 
-                  />
-                )}
-
+        <Card title="" style={styles.card}>
+          <h2 style={styles.header}>Leaf Disease Prediction</h2>
+          <div style={styles.row}>
+            {/* Left Panel – Image + Upload */}
+            <div style={styles.leftPanel}>
+              {preview && <img src={preview} alt="Preview" style={styles.previewImage} />}
+              <label style={styles.label}>Choose Leaf Image</label>
+              <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
+              <div style={styles.buttonRow}>
                 <button
                   onClick={handleUpload}
-                  style={{
-                    ...styles.uploadButton,
-                    ...(uploading ? styles.disabledButton : {})
-                  }}
                   disabled={uploading || !file}
-                  aria-busy={uploading}
+                  style={{ ...styles.button, backgroundColor: '#4a90e2' }}
                 >
-                  {uploading ? 'Processing...' : 'Predict'}
+                  {uploading ? 'Processing...' : 'Predict from File'}
+                </button>
+                <button
+                  onClick={handleCaptureFromESP32}
+                  disabled={uploading}
+                  style={{ ...styles.button, backgroundColor: '#28a745' }}
+                >
+                  {uploading ? 'Capturing...' : 'Capture from ESP32-CAM'}
                 </button>
               </div>
-
               {error && <p style={styles.errorText}>{error}</p>}
-            </Card>
-          </div>
+            </div>
 
-          {/* Results Card - Right Side */}
-          <div style={styles.resultSection}>
-            {prediction ? (
-              <Card title="Prediction Result" style={styles.card}>
-                <div style={styles.predictionResult}>
-                  <p style={styles.predictionText}>
-                    <strong>Disease:</strong> {prediction.disease}
-                  </p>
-                  {prediction.image_url ? (
-                    <img
-                      src={prediction.image_url}
-                      alt="Predicted leaf analysis"
-                      style={styles.predictedImage}
-                    />
-                  ) : (
-                    <p style={styles.noImageText}>No image available</p>
-                  )}
-                </div>
-              </Card>
-            ) : (
-              <Card title="Results" style={styles.card}>
-                <p style={styles.placeholderText}>
-                  {uploading ? 'Analyzing your image...' : 'Upload an image to get started'}
-                </p>
-              </Card>
+            {/* Right Panel – Prediction Text */}
+            {prediction && (
+              <div style={styles.rightPanel}>
+                <p><strong>Disease:</strong> {prediction.disease}</p>
+                <p><strong>Symptoms:</strong> {prediction.symptoms}</p>
+                <p><strong>Cause:</strong> {prediction.cause}</p>
+                <p><strong>Precautions:</strong> {prediction.precautions}</p>
+                <p><strong>Organic Remedies:</strong> {prediction.organic_remedies}</p>
+                <p><strong>Chemical Treatment:</strong> {prediction.chemical_treatment}</p>
+              </div>
             )}
           </div>
-        </div>
+        </Card>
+
       </main>
     </div>
   );
@@ -144,115 +136,90 @@ function PredictPage() {
 
 const styles = {
   pageContainer: {
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    minHeight: '100vh',
+    fontFamily: 'Segoe UI, sans-serif',
     backgroundColor: '#e5eff5',
+    minHeight: '100vh',
   },
   mainContent: {
-    padding: '20px 0 40px',
-  },
-  contentWrapper: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 20px',
+    padding: '10px 30px',
     display: 'flex',
-    gap: '40px',
-  },
-  uploadSection: {
-    flex: 1,
-    minWidth: '400px',
-  },
-  resultSection: {
-    flex: 1,
-    minWidth: '400px',
+    justifyContent: 'center',
   },
   card: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    flex: 1,
-  },
-  fileInputLabel: {
-    display: 'block',
-    padding: '12px',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
-    cursor: 'pointer',
-    textAlign: 'center',
-    backgroundColor: '#f8f9fa',
-    transition: 'background-color 0.3s ease',
-    ':hover': {
-      backgroundColor: '#e9ecef',
-    },
-  },
-  fileInput: {
-    display: 'none',
-  },
-  uploadButton: {
-    padding: '12px 0',
-    backgroundColor: '#4a90e2',
-    color: '#fff',
-    fontWeight: '600',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '16px',
-    transition: 'background-color 0.3s ease',
-    ':hover': {
-      backgroundColor: '#357abd',
-    },
-  },
-  disabledButton: {
-    backgroundColor: '#cccccc',
-    cursor: 'not-allowed',
-  },
-  errorText: {
-    marginTop: '15px',
-    color: '#d9534f',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  previewImage: {
+    maxWidth: '1200px',
     width: '100%',
-    maxHeight: '200px',
-    objectFit: 'contain',
-    borderRadius: '8px',
-    margin: '10px 0',
+    padding: '30px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '25px',
   },
-  predictionResult: {
+  flexContainer: {
+    display: 'flex',
+    gap: '30px',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  row: {
+    display: 'flex',
+    gap: '30px',
+    flexWrap: 'wrap', // allows responsive wrapping
+  },
+
+  leftPanel: {
+    flex: 1,
+    minWidth: '280px',
     display: 'flex',
     flexDirection: 'column',
     gap: '15px',
-    height: '100%',
   },
-  predictionText: {
-    fontWeight: '600',
-    fontSize: '18px',
-    margin: 0,
-  },
-  predictedImage: {
-    width: '100%',
-    borderRadius: '12px',
-    objectFit: 'contain',
-    maxHeight: '350px',
+
+  rightPanel: {
     flex: 1,
+    minWidth: '300px',
+    maxHeight: '600px',
+    backgroundColor: '#f8f9fa',
+    padding: '20px',
+    borderRadius: '12px',
+    border: '1px solid #ccc',
+    lineHeight: 3.9,
+    marginTop:'-50px',
+
   },
-  noImageText: {
-    color: '#666',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    header: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    textAlign: 'left',
   },
-  placeholderText: {
-    color: '#666',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    margin: '40px 0',
+  label: {
+    fontWeight: 1200,
+  },
+  buttonRow: {
+    display: 'flex',
+    gap: '10px',
+    width:'450px',
+  },
+  button: {
+    flex: 1,
+    padding: '10px',
+    color: '#fff',
+    fontWeight: 'bold',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+  },
+  previewImage: {
+    width: '250px',
+    height: '250px',
+    objectFit: 'cover', // or 'contain' if you want full view
+    borderRadius: '10px',
+    border: '1px solid #ccc',
+    marginTop: '10px',
+    alignSelf: 'center',
+  },
+  errorText: {
+    color: '#d9534f',
+    fontWeight: '600',
   },
 };
 

@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/Card';
 import Navbar from '../components/Navbar';
-import { fetchlivePredictionData } from '../services/api'; // your axios API function
+import { fetchlivePredictionData } from '../services/api';
 
 function LivePage() {
   const [sensorData, setSensorData] = useState([]);
   const [loadingSensor, setLoadingSensor] = useState(false);
   const [sensorError, setSensorError] = useState(null);
+  const videoContainerRef = useRef(null);
 
   useEffect(() => {
     const loadLiveSensorData = async () => {
@@ -24,68 +25,58 @@ function LivePage() {
 
     loadLiveSensorData();
     const interval = setInterval(loadLiveSensorData, 180000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // Get the latest sensor entry based on timestamp
   const latestEntry = sensorData.length
     ? [...sensorData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0]
     : null;
+
+  const handleFullscreen = () => {
+    const elem = videoContainerRef.current;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+  };
 
   return (
     <>
       <Navbar />
       <div style={styles.page}>
         <div style={styles.contentWrapper}>
-          <h2 style={styles.header}>📡 Live Monitoring</h2>
+          <h2 style={styles.header}>Live Monitoring</h2>
 
-          <div style={styles.innerContainer}>
-            {/* Left: Live Camera Feed */}
-            <div style={styles.leftPane}>
-              <Card title="📷 Live Camera Feed">
-                <div style={styles.videoBox}>
-                  <iframe
-                    src="http://your-esp32-cam-stream.local" // Replace with your ESP32-CAM stream URL
-                    style={styles.iframe}
-                    title="Live Camera"
-                    allow="camera"
-                  />
-                </div>
-              </Card>
-            </div>
+          <Card title={null}>
+            <div ref={videoContainerRef} style={styles.fullscreenWrapper}>
+              <iframe
+                src="http://192.168.0.50/stream"
+                style={styles.fullscreenVideo}
+                title="Live Camera"
+                allow="camera"
+              />
 
-            {/* Right: Live Sensor Readings */}
-            <div style={styles.rightPane}>
-              <Card title="📊 Live Sensor Readings">
-                {loadingSensor && <p>Loading sensor data...</p>}
-
-                {sensorError && <p style={{ color: 'red' }}>{sensorError}</p>}
-
-                {!loadingSensor && !sensorError && !latestEntry && (
-                  <p>No live data available.</p>
-                )}
-
-                {!loadingSensor && !sensorError && latestEntry && (
-                  <div style={styles.grid}>
-                    {Object.entries(latestEntry).map(([key, value]) => {
-                      if (key === 'timestamp') return null; // skip timestamp display
-                      return (
-                        <div key={key} style={styles.miniCard}>
-                          <p>
-                            <strong>{key.replace(/_/g, ' ')}:</strong> {value}
-                          </p>
-                        </div>
-                      );
-                    })}
-                    <div style={{ gridColumn: '1 / -1', fontSize: 12, color: '#666' }}>
-                      Timestamp: {new Date(latestEntry.timestamp).toLocaleString()}
-                    </div>
+              {/* Sensor readings overlay */}
+              {latestEntry && (
+                <div style={styles.sensorOverlay}>
+                  {Object.entries(latestEntry).map(([key, value]) => {
+                    if (key === 'timestamp' || key === 'id') return null;
+                    return (
+                      <div key={key} style={styles.sensorItem}>
+                        <strong>{key.replace(/_/g, ' ')}:</strong> {value}
+                      </div>
+                    );
+                  })}
+                  <div style={styles.timestamp}>
+                    {new Date(latestEntry.timestamp).toLocaleString()}
                   </div>
-                )}
-              </Card>
+                </div>
+              )}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </>
@@ -95,57 +86,62 @@ function LivePage() {
 const styles = {
   page: {
     padding: 20,
-    maxWidth: 1200,
+    maxWidth: 1400,
     margin: 'auto',
     fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
   },
   contentWrapper: {
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#fefefe',
+    backgroundColor: '#ffffff',
   },
   header: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 24,
+    fontSize: 32,
+    fontWeight: '700',
+    marginBottom: 30,
     textAlign: 'left',
+    color: '#222',
   },
-  innerContainer: {
-    display: 'flex',
-    gap: 20,
-    flexWrap: 'wrap',
-  },
-  leftPane: {
-    flex: 1,
-    minWidth: 300,
-  },
-  rightPane: {
-    flex: 1,
-    minWidth: 300,
-  },
-  videoBox: {
+  fullscreenWrapper: {
+    position: 'Right',
     width: '100%',
-    aspectRatio: '4 / 3',
+    maxWidth: '804px',   // Match XGA width
+    height: '604px', 
+    backgroundColor: '#000',
     borderRadius: 10,
     overflow: 'hidden',
-    border: '1px solid #ddd',
+    border: '2px solid #000',
+    aspectRatio: '4 / 3', 
   },
-  iframe: {
+  fullscreenVideo: {
     width: '100%',
     height: '100%',
     border: 'none',
+    display: 'block',
+    objectFit: 'cover', // if you want exact fill
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-    gap: 15,
-  },
-  miniCard: {
-    backgroundColor: '#f9f9f9',
-    padding: 12,
+  sensorOverlay: {
+    position: 'absolute',
+    top: 230,
+    right: 420,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: '14px 16px',
+    border: '1px solid #333',
     borderRadius: 8,
-    boxShadow: '1px 1px 3px rgba(0,0,0,0.1)',
+    fontSize: 14,
+    lineHeight: '2.9',
+    maxWidth: 440,
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+  },
+  sensorItem: {
+    marginBottom: 4,
+  },
+  timestamp: {
+    fontSize: 11,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'right',
   },
 };
 

@@ -9,17 +9,17 @@ import img3 from '../assets/Visualize-Your-Garden-Dashboard.jpg';
 
 const slides = [
   {
-    title: "Monitor Your Plants Live 🌱",
+    title: "Monitor Your Plants Live",
     description: "Get real-time updates on soil moisture, temperature, humidity, and more.",
     image: img1,
   },
   {
-    title: "Predict Plant Diseases 🧪",
+    title: "Predict Plant Diseases",
     description: "Use AI to detect diseases early from leaf images and keep your plants healthy.",
     image: img2,
   },
   {
-    title: "Visualize Your Garden Dashboard 📊",
+    title: "Visualize Your Garden Dashboard",
     description: "Track historical data and trends to optimize your gardening routine.",
     image: img3,
   }

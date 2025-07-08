@@ -1,0 +1,107 @@
+{
+    "Pepper__bell___Bacterial_spot": {
+        "symptoms": "Dark, water-soaked spots on leaves and fruits, eventually becoming necrotic.",
+        "cause": "Bacterium Xanthomonas campestris pv. vesicatoria.",
+        "precautions": "Avoid overhead irrigation, use certified disease-free seeds, and rotate crops.",
+        "organic_remedies": "Apply copper-based fungicides and neem oil. Improve air circulation.",
+        "chemical_treatment": "Use bactericides containing copper hydroxide or streptomycin sulfate."
+    },
+    "Pepper__bell___healthy": {
+        "symptoms": "No visible disease symptoms. Leaves are green and fruits are unblemished.",
+        "cause": "Not applicable.",
+        "precautions": "Maintain good hygiene and monitor for pests.",
+        "organic_remedies": "Proper watering, pruning, and compost use.",
+        "chemical_treatment": "No treatment needed."
+    },
+    "Potato___Early_blight": {
+        "symptoms": "Brown spots with concentric rings on older leaves, yellowing of foliage.",
+        "cause": "Fungal pathogen Alternaria solani.",
+        "precautions": "Avoid overhead watering and remove infected debris.",
+        "organic_remedies": "Apply compost tea or copper sprays.",
+        "chemical_treatment": "Use fungicides like chlorothalonil or mancozeb."
+    },
+    "Potato___healthy": {
+        "symptoms": "Lush green foliage and undamaged tubers.",
+        "cause": "Not applicable.",
+        "precautions": "Ensure crop rotation and pest monitoring.",
+        "organic_remedies": "Apply compost regularly.",
+        "chemical_treatment": "No treatment required."
+    },
+    "Potato___Late_blight": {
+        "symptoms": "Dark lesions on leaves and stems, white fungal growth under leaves.",
+        "cause": "Phytophthora infestans (a water mold).",
+        "precautions": "Avoid wet conditions and overcrowding.",
+        "organic_remedies": "Use copper sprays and remove infected plants.",
+        "chemical_treatment": "Apply metalaxyl or mancozeb-based fungicides."
+    },
+    "Tomato_Bacterial_spot": {
+        "symptoms": "Small water-soaked lesions on leaves, stems, and fruits.",
+        "cause": "Caused by Xanthomonas species.",
+        "precautions": "Avoid wet foliage, use disease-free seeds.",
+        "organic_remedies": "Use copper-based sprays and prune affected parts.",
+        "chemical_treatment": "Use copper bactericides or streptomycin."
+    },
+    "Tomato_Early_blight": {
+        "symptoms": "Dark spots with concentric rings and yellowing leaves.",
+        "cause": "Fungal pathogen Alternaria solani.",
+        "precautions": "Use resistant varieties, mulch to prevent soil splash.",
+        "organic_remedies": "Compost tea and neem oil.",
+        "chemical_treatment": "Fungicides like chlorothalonil and mancozeb."
+    },
+    "Tomato_healthy": {
+        "symptoms": "Dark green, vibrant foliage with healthy fruits.",
+        "cause": "Not applicable.",
+        "precautions": "Continue good cultural practices.",
+        "organic_remedies": "Regular composting and crop rotation.",
+        "chemical_treatment": "None needed."
+    },
+    "Tomato_Late_blight": {
+        "symptoms": "Brown spots on leaves and stems with white fuzzy growth.",
+        "cause": "Caused by Phytophthora infestans.",
+        "precautions": "Avoid high humidity, ensure spacing for air flow.",
+        "organic_remedies": "Remove affected leaves and apply copper sprays.",
+        "chemical_treatment": "Use fungicides with metalaxyl or chlorothalonil."
+    },
+    "Tomato_Leaf_Mold": {
+        "symptoms": "Yellow spots on upper leaf surface, gray mold underneath.",
+        "cause": "Caused by Passalora fulva.",
+        "precautions": "Avoid crowding, improve air circulation.",
+        "organic_remedies": "Apply baking soda or potassium bicarbonate solutions.",
+        "chemical_treatment": "Use chlorothalonil or mancozeb."
+    },
+    "Tomato_Septoria_leaf_spot": {
+        "symptoms": "Circular spots with gray centers and dark margins on lower leaves.",
+        "cause": "Fungus Septoria lycopersici.",
+        "precautions": "Avoid overhead watering and remove infected foliage.",
+        "organic_remedies": "Apply compost tea and neem oil.",
+        "chemical_treatment": "Spray with fungicides like chlorothalonil."
+    },
+    "Tomato_Spider_mites_Two_spotted_spider_mite": {
+        "symptoms": "Tiny yellow or white speckles on leaves, fine webbing.",
+        "cause": "Tetranychus urticae infestation.",
+        "precautions": "Maintain humidity and monitor undersides of leaves.",
+        "organic_remedies": "Use insecticidal soap or neem oil.",
+        "chemical_treatment": "Use miticides like abamectin or bifenthrin."
+    },
+    "Tomato__Target_Spot": {
+        "symptoms": "Small dark spots with light centers and concentric rings.",
+        "cause": "Caused by Corynespora cassiicola fungus.",
+        "precautions": "Remove plant debris and avoid overhead irrigation.",
+        "organic_remedies": "Use neem oil and sulfur dust.",
+        "chemical_treatment": "Use chlorothalonil or mancozeb."
+    },
+    "Tomato__Tomato_mosaic_virus": {
+        "symptoms": "Mottled yellow and green patches, stunted growth, leaf curling.",
+        "cause": "Tobamovirus transmitted by handling and tools.",
+        "precautions": "Avoid handling plants when wet. Disinfect tools.",
+        "organic_remedies": "Remove infected plants, use resistant varieties.",
+        "chemical_treatment": "No chemical cure; only management practices."
+    },
+    "Tomato__Tomato_YellowLeaf__Curl_Virus": {
+        "symptoms": "Yellowing and curling of leaves, stunted growth.",
+        "cause": "Begomovirus spread by whiteflies.",
+        "precautions": "Control whitefly population and use virus-free transplants.",
+        "organic_remedies": "Neem oil sprays and yellow sticky traps.",
+        "chemical_treatment": "Use insecticides targeting whiteflies (imidacloprid)."
+    }
+}

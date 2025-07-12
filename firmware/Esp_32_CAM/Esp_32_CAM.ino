@@ -8,8 +8,8 @@
 #include "camera_pins.h"
 
 // WiFi credentials
-const char *ssid = "Hari";
-const char *password = "12345678";
+const char *ssid = "****";
+const char *password = "****!";
 
 // HTTP server
 WebServer server(80);

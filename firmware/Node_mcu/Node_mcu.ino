@@ -4,8 +4,8 @@
 #include <ArduinoJson.h>
 
 // WiFi credentials
-const char* ssid = "scrap";
-const char* password = "we4rscrap!";
+const char* ssid = "Hari";
+const char* password = "12345678";
 
 // Supabase API Info
 const char* host = "mzoqcldcrokbeyceysfr.supabase.co";

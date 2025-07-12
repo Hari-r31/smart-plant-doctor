@@ -1,18 +1,17 @@
 #include <FS.h>
-
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <WebServer.h>
 
-// Select camera model
+// Camera model
 #define CAMERA_MODEL_AI_THINKER
 #include "camera_pins.h"
 
 // WiFi credentials
-const char *ssid = "scrap";
-const char *password = "we4rscrap!";
+const char *ssid = "Hari";
+const char *password = "12345678";
 
-// HTTP server on port 80
+// HTTP server
 WebServer server(80);
 
 // Stream handler
@@ -39,7 +38,7 @@ void handleJPGStream() {
   }
 }
 
-// Single capture handler
+// Capture handler
 void handleCapture() {
   camera_fb_t *fb = esp_camera_fb_get();
   if (!fb) {
@@ -51,7 +50,7 @@ void handleCapture() {
   esp_camera_fb_return(fb);
 }
 
-// Setup camera server with both stream and capture endpoints
+// Start server
 void startCameraServer() {
   server.on("/", HTTP_GET, []() {
     server.send(200, "text/html",
@@ -69,6 +68,7 @@ void startCameraServer() {
   Serial.println("Camera server started");
 }
 
+// Optional: Flash control
 void setupLedFlash(int pin) {
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
@@ -76,9 +76,11 @@ void setupLedFlash(int pin) {
 
 void setup() {
   Serial.begin(115200);
+  delay(1000);
   Serial.setDebugOutput(true);
-  Serial.println();
+  Serial.println("Booting...");
 
+  // Camera config
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -100,22 +102,25 @@ void setup() {
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
-  config.frame_size = FRAMESIZE_UXGA;
+  config.frame_size = FRAMESIZE_SVGA;
   config.jpeg_quality = 10;
   config.fb_count = 2;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.grab_mode = CAMERA_GRAB_LATEST;
 
+  Serial.println("Initializing camera...");
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x\n", err);
-    return;
+    delay(5000);
+    ESP.restart();
   }
+  Serial.println("Camera init success");
 
   sensor_t *s = esp_camera_sensor_get();
   s->set_framesize(s, FRAMESIZE_SVGA);
   s->set_quality(s, 4);
-  s->set_brightness(s, 2);
+  s->set_brightness(s, 1);
   s->set_contrast(s, 1);
   s->set_saturation(s, 0);
   s->set_special_effect(s, 0);
@@ -135,15 +140,15 @@ void setup() {
   setupLedFlash(LED_GPIO_NUM);
 #endif
 
-  IPAddress local_IP(192, 168, 0, 50);
-  IPAddress gateway(192, 168, 0, 1);
+  // Static IP setup
+  IPAddress local_IP(10, 57, 74, 50);
+  IPAddress gateway(10, 57, 74, 254);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.config(local_IP, gateway, subnet);
 
   WiFi.begin(ssid, password);
   WiFi.setSleep(false);
-
-  Serial.print("WiFi connecting");
+  Serial.println("Connecting to WiFi...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");

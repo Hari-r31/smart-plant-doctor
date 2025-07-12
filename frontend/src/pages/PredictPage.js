@@ -68,7 +68,7 @@ function PredictPage() {
     setPrediction(null);
 
     try {
-      const response = await fetch('http://192.168.0.50/capture');
+      const response = await fetch('http://10.57.74.50/capture');
       if (!response.ok) throw new Error('Failed to fetch image from ESP32-CAM');
 
       const blob = await response.blob();

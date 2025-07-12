@@ -53,7 +53,7 @@ function LivePage() {
           <Card title={null}>
             <div ref={videoContainerRef} style={styles.fullscreenWrapper}>
               <iframe
-                src="http://192.168.0.50/stream"
+                src="http://10.57.74.50/stream"
                 style={styles.fullscreenVideo}
                 title="Live Camera"
                 allow="camera"

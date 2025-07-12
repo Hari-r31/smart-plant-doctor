@@ -13,6 +13,17 @@ const int httpsPort = 443;
 const char* supabase_url = "/rest/v1/sensor_data";
 const char* supabase_key = "***************************************************8";
 
+// // WiFi credentials
+// const char* ssid = "Hari";
+// const char* password = "12345678";
+
+// // Supabase API Info
+// const char* host = "mzoqcldcrokbeyceysfr.supabase.co";
+// const int httpsPort = 443;
+// const char* supabase_url = "/rest/v1/sensor_data";
+// const char* supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16b3FjbGRjcm9rYmV5Y2V5c2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMzU3NTEsImV4cCI6MjA2MzkxMTc1MX0.MlW-UMKZw4DusY2QDKEA_BiOvgSJ0ddoq6J7mSBLKeQ";
+
+
 // Sensor Pins
 #define SOIL_PIN A0
 #define DHTPIN D4

@@ -11,6 +11,10 @@
 const char *ssid = "****";
 const char *password = "****!";
 
+// // WiFi credentials
+// const char* ssid = "Hari";
+// const char* password = "12345678";
+
 // HTTP server
 WebServer server(80);
 
